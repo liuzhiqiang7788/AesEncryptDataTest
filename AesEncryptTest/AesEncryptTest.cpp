@@ -59,7 +59,7 @@ unsigned long EVP_Encpty_Decrypt_Data()
 	/*init ctx*/
 	EVP_CIPHER_CTX_init(&ctx);
 
-	ret = EVP_EncryptInit_ex(&ctx, EVP_aes_128_ecb(), NULL, (unsigned char*)userkey, iv);
+	ret = EVP_EncryptInit_ex(&ctx, EVP_aes_256_ecb(), NULL, (unsigned char*)userkey, iv);
 	if (ret != 1) {
 		cout << "EVP_EncryptInit_ex failed" << endl;
 		return -1;
@@ -88,7 +88,7 @@ unsigned long EVP_Encpty_Decrypt_Data()
 	EVP_CIPHER_CTX_cleanup(&ctx);
 	EVP_CIPHER_CTX_init(&ctx);
 
-	ret = EVP_DecryptInit_ex(&ctx, EVP_aes_128_ecb(), NULL, (unsigned char*)userkey, iv);
+	ret = EVP_DecryptInit_ex(&ctx, EVP_aes_256_ecb(), NULL, (unsigned char*)userkey, iv);
 	if (ret != 1) {
 		cout << "EVP_DecryptInit_ex failed" << endl;
 		return -1;
