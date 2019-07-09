@@ -40,7 +40,7 @@ namespace ibex {
 				// allocate a memory prepare for encrypt need smart class pointer
 				int origin_len = _buffer.size();
 				IEncryptionData_t origin_buffer = _buffer;
-				std::shared_ptr<unsigned char[]> encrypt_buffer(new unsigned char[2 * origin_len]);
+				IEncryptionData_t encrypt_buffer(2 * origin_len);
 				EVP_CIPHER_CTX ctx;
 				IEncryptionData_t iv(EVP_MAX_IV_LENGTH);
 				int ret;

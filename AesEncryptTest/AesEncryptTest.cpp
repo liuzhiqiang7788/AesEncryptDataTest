@@ -20,7 +20,6 @@ unsigned long EVP_Encpty_Decrypt_Data();
 typedef vector<unsigned char> IEncryptionData_t;
 int main()
 {
-	printf(" value == %s: \n", &iv[0]);
 	int ret = 0;
 	ret = EVP_Encpty_Decrypt_Data();
 	if (0 == ret)
