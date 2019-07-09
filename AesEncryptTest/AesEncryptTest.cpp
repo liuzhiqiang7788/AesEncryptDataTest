@@ -17,8 +17,10 @@ using namespace std;
 unsigned long AES_Encpty_Decrypt_Data();
 unsigned long EVP_Encpty_Decrypt_Data();
 
+typedef vector<unsigned char> IEncryptionData_t;
 int main()
 {
+	printf(" value == %s: \n", &iv[0]);
 	int ret = 0;
 	ret = EVP_Encpty_Decrypt_Data();
 	if (0 == ret)
@@ -39,7 +41,7 @@ int main()
 
 unsigned long EVP_Encpty_Decrypt_Data()
 {
-	char userkey[EVP_MAX_KEY_LENGTH];
+	char userkey[23];
 	unsigned char iv[EVP_MAX_IV_LENGTH];
 	unsigned char *data = (unsigned char*)malloc(AES_BLOCK_SIZE * 3);
 	unsigned char *encrypt = (unsigned char*)malloc(AES_BLOCK_SIZE * 6);
@@ -50,7 +52,7 @@ unsigned long EVP_Encpty_Decrypt_Data()
 	int mlen = 0;
 	int flen = 0;
 
-	memset((void*)userkey, 'k', EVP_MAX_KEY_LENGTH);
+	memset((void*)userkey, 'k', 21);
 	memset((void*)iv, 'i', EVP_MAX_IV_LENGTH);
 	memset((void*)data, 'p', AES_BLOCK_SIZE * 3);
 	memset((void*)encrypt, 0, AES_BLOCK_SIZE * 6);
@@ -144,7 +146,7 @@ unsigned long AES_Encpty_Decrypt_Data()
 	string strEncryptData;
 	string strDecryptData;
 
-	string strKey = "0123456789abcdef0123456789abcdef";
+	string strKey = "0123456789abcdef012345";
 
 	vector<unsigned char> ivec(AES_BLOCK_SIZE);
 

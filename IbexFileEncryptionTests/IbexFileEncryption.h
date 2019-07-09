@@ -11,16 +11,16 @@ namespace ibex {
 
 		class CIbexFileEncryption
 		{
-			typedef vector<unsigned char> IFileEncryption_t;
+			typedef vector<unsigned char> IEncryptionData_t;
 			typedef std::basic_string<char> tstring;
 
 		public:
-			CIbexFileEncryption(const string &key);
+			CIbexFileEncryption(const tstring &key);
 			~CIbexFileEncryption();
-			void encrypt(const IFileEncryption_t &_buffer, const tstring &_destFilePath);
-			void decrypt(const tstring &_srcFilePath, IFileEncryption_t &_buffer);
+			void encrypt(const IEncryptionData_t &_buffer, const tstring &_destFilePath);
+			void decrypt(const tstring &_srcFilePath, IEncryptionData_t &_buffer);
 		private:
-			string m_sKey;
+			tstring m_sKey;
 		};
 
 	} //namespace encryption
