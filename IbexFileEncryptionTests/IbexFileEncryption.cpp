@@ -76,11 +76,13 @@ namespace ibex {
 				// write file
 				std::ofstream out;
 				out.open(_destFilePath, std::ios::out | std::ios::binary);
-				if (out.is_open())
+				if (!out.is_open())
 				{
-					out << &encrypt_buffer[0];
-					out.close();
+					std::cout << "open dest file failed!" << std::endl;
+					return;
 				}
+				out << &encrypt_buffer[0];
+				out.close();
 			}
 			catch (const std::exception& e)
 			{
@@ -104,8 +106,14 @@ namespace ibex {
 			{
 				std::ifstream in;
 				in.open(_srcFilePath, std::ios::in | std::ios::binary);
+				if (!in.is_open())
+				{
+					std::cout << "open src file failed!" << std::endl;
+					return;
+				}
 				std::stringstream buffer;
 				buffer << in.rdbuf();
+				in.close();
 
 				int encrypt_len = buffer.str().size();
 				encryptBufferData_t decrypt_buff(encrypt_len);
@@ -140,7 +148,6 @@ namespace ibex {
 				}
 
 				_buffer = decrypt_buff;
-
 			}
 			catch (const std::exception& e)
 			{
