@@ -2,8 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
-using namespace std;
+#include <windows.h>
 
 namespace ibex {
 
@@ -11,14 +10,14 @@ namespace ibex {
 
 		class CIbexFileEncryption
 		{
-			typedef vector<unsigned char> IEncryptionData_t;
-			typedef std::basic_string<char> tstring;
+			typedef std::vector<unsigned char> encryptBufferData_t;
+			typedef std::basic_string<TCHAR> tstring;
 
 		public:
 			CIbexFileEncryption(const tstring &key);
 			~CIbexFileEncryption();
-			void encrypt(const IEncryptionData_t &_buffer, const tstring &_destFilePath);
-			void decrypt(const tstring &_srcFilePath, IEncryptionData_t &_buffer);
+			void encrypt(const encryptBufferData_t &_buffer, const tstring &_destFilePath);
+			void decrypt(const tstring &_srcFilePath, encryptBufferData_t &_buffer);
 		private:
 			tstring m_sKey;
 		};
