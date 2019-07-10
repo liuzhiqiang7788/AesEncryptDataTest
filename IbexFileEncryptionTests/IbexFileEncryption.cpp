@@ -6,6 +6,7 @@
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 #include <fstream>
+#include <sstream>
 
 namespace ibex {
 
@@ -73,11 +74,11 @@ namespace ibex {
 				total_len = update_len + final_len;
 
 				// write file
-				std::ofstream out(_destFilePath, std::fstream::out);
-				out.open(_destFilePath, std::ios::in | std::ios::out | std::ios::binary);
+				std::ofstream out;
+				out.open(_destFilePath, std::ios::out | std::ios::binary);
 				if (out.is_open())
 				{
-					out << (unsigned char*)&encrypt_buffer[0];
+					out << &encrypt_buffer[0];
 					out.close();
 				}
 			}
@@ -101,12 +102,12 @@ namespace ibex {
 			}
 			try
 			{
-				// allocate memory
-				encryptBufferData_t encrypt_buff;
-				// read file and copy to memory
-				//encrypt_buff.push_back();
+				std::ifstream in;
+				in.open(_srcFilePath, std::ios::in | std::ios::binary);
+				std::stringstream buffer;
+				buffer << in.rdbuf();
 
-				int encrypt_len = encrypt_buff.size();
+				int encrypt_len = buffer.str().size();
 				encryptBufferData_t decrypt_buff(encrypt_len);
 
 				// decrypt process and copy decrypt data to buffer
@@ -126,7 +127,7 @@ namespace ibex {
 				}
 
 				EVP_CIPHER_CTX_set_padding(&ctx, 0);
-				ret = EVP_DecryptUpdate(&ctx, (unsigned char*)&decrypt_buff[0], &update_len, (unsigned char*)&encrypt_buff[0], encrypt_len);
+				ret = EVP_DecryptUpdate(&ctx, (unsigned char*)&decrypt_buff[0], &update_len, (unsigned char*)buffer.str().c_str(), encrypt_len);
 				if (ret != 1) {
 					std::cout << "EVP_DecryptUpdate failed" << std::endl;
 					return;
@@ -139,8 +140,6 @@ namespace ibex {
 				}
 
 				_buffer = decrypt_buff;
-
-				//free memory and close fd , EVP handl close
 
 			}
 			catch (const std::exception& e)
