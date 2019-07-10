@@ -64,6 +64,11 @@ namespace ibex {
 					std::cout << "EVP_EncryptUpdate failed" << std::endl;
 					return;
 				}
+				if (update_len >= 2*origin_len)
+				{
+					int n = update_len / (2 * origin_len);
+					encrypt_buffer.resize((n+1) * 2 * origin_len);
+				}
 
 				ret = EVP_EncryptFinal_ex(&ctx, (unsigned char*)&encrypt_buffer[update_len], &final_len);
 				if (ret != 1) {
@@ -81,7 +86,11 @@ namespace ibex {
 					std::cout << "open dest file failed!" << std::endl;
 					return;
 				}
-				out << &encrypt_buffer[0];
+				
+				for (int i = 0; i < total_len; i++)
+				{
+					out << encrypt_buffer[i];
+				}
 				out.close();
 			}
 			catch (const std::exception& e)
@@ -140,14 +149,24 @@ namespace ibex {
 					std::cout << "EVP_DecryptUpdate failed" << std::endl;
 					return;
 				}
+				if (update_len >= encrypt_len)
+				{
+					int n = update_len / encrypt_len;
+					decrypt_buff.resize((n+1) * encrypt_len);
+				}
 
 				ret = EVP_DecryptFinal_ex(&ctx, (unsigned char*)&decrypt_buff[update_len], &final_len);
 				if (ret != 1) {
 					std::cout << "EVP_DecryptFinal_ex failed" << std::endl;
 					return;
 				}
+				total_len = update_len + final_len;
 
-				_buffer = decrypt_buff;
+				_buffer.clear();
+				for (int i = 0; i < total_len; i++)
+				{
+					_buffer.push_back(decrypt_buff[i]);
+				}
 			}
 			catch (const std::exception& e)
 			{

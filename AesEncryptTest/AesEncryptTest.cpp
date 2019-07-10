@@ -22,30 +22,6 @@ typedef vector<unsigned char> IEncryptionData_t;
 
 int main()
 {
-	char file_path[] = { "C:\\Users\\HYD\\encryption\\test7.txt" };
-	vector<unsigned char> iv(EVP_MAX_IV_LENGTH);
-	for (size_t i = 0; i < EVP_MAX_IV_LENGTH; i++)
-	{
-		iv[i] = i + 1;
-	}
-	vector<unsigned char>ivc;
-	ivc = iv;
-
-	std::ifstream in;
-	in.open(file_path, std::ios::in | std::ios::binary);
-	std::stringstream buffer;
-	buffer << in.rdbuf();
-	std::string str(buffer.str());
-	int len = buffer.str().size();
-	//std::ofstream out;
-	//out.open(file_path, std::ios::out | std::ios::binary);
-	//if (out.is_open())
-	//{
-	//	out <<"skjflsjflsjaljksjdlk";
-	//	out.close();
-	//}
-
-
 	int ret = 0;
 	ret = EVP_Encpty_Decrypt_Data();
 	if (0 == ret)
@@ -82,7 +58,7 @@ unsigned long EVP_Encpty_Decrypt_Data()
 	memset((void*)data, 'p', AES_BLOCK_SIZE * 3);
 	memset((void*)encrypt, 0, AES_BLOCK_SIZE * 6);
 	memset((void*)plain, 0, AES_BLOCK_SIZE * 6);
-
+	
 	/*init ctx*/
 	EVP_CIPHER_CTX_init(&ctx);
 
