@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "IbexFileEncryption.h"
+#include "define.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <vector>
@@ -22,18 +23,23 @@ namespace ibex {
 
 		}
 
-		void CIbexFileEncryption::encrypt(const encryptBufferData_t &_buffer, const tstring &_destFilePath)
+		unsigned long CIbexFileEncryption::encrypt(const encryptBufferData_t &_buffer, const tstring &_destFilePath)
 		{
 			// need check _buffer whether is empty
-			if (_buffer.empty() || _destFilePath.empty())
+			if (_buffer.empty())
 			{
-				std::cout << "input parameter invalid" << std::endl;
-				return;
+				std::cout << "buffer invalid" << std::endl;
+				return IBEX_ENCRYPTION_BUFFER_EMPTY;
+			}
+			if (_destFilePath.empty())
+			{
+				std::cout << "dest file path invalid" << std::endl;
+				return IBEX_ENCRYPTION_FILE_EMPTY;
 			}
 			if (m_sKey.empty())
 			{
 				std::cout << "key value is null" << std::endl;
-				return;
+				return IBEX_ENCRYPTION_KEY_EMPTY;
 			}
 
 			try
@@ -54,7 +60,7 @@ namespace ibex {
 				ret = EVP_EncryptInit_ex(&ctx, EVP_aes_256_ecb(), NULL, (unsigned char*)m_sKey.c_str(), (unsigned char*)&iv[0]);
 				if (ret != 1) {
 					std::cout << "EVP_EncryptInit_ex failed" << std::endl;
-					return;
+					return IBEX_ENCRYPTION_INIT_FAILED;
 				}
 
 				EVP_CIPHER_CTX_set_padding(&ctx, 0);
@@ -62,7 +68,7 @@ namespace ibex {
 				ret = EVP_EncryptUpdate(&ctx, (unsigned char*)&encrypt_buffer[0], &update_len, (unsigned char*)&_buffer[0], origin_len);
 				if (ret != 1) {
 					std::cout << "EVP_EncryptUpdate failed" << std::endl;
-					return;
+					return IBEX_ENCRYPTION_UPDATE_FAILED;
 				}
 				if (update_len >= 2*origin_len)
 				{
@@ -73,7 +79,7 @@ namespace ibex {
 				ret = EVP_EncryptFinal_ex(&ctx, (unsigned char*)&encrypt_buffer[update_len], &final_len);
 				if (ret != 1) {
 					std::cout << "EVP_EncryptFinal_ex failed" << std::endl;
-					return;
+					return IBEX_ENCRYPTION_FINAL_FAILED;
 				}
 
 				total_len = update_len + final_len;
@@ -84,7 +90,7 @@ namespace ibex {
 				if (!out.is_open())
 				{
 					std::cout << "open dest file failed!" << std::endl;
-					return;
+					return IBEX_ENCRYPTION_FILE_OPEN_FAILED;
 				}
 				
 				for (int i = 0; i < total_len; i++)
@@ -96,20 +102,22 @@ namespace ibex {
 			catch (const std::exception& e)
 			{
 				std::cerr << "encrypt exception caused by: " << e.what() << std::endl;
-				return;
+				return IBEX_ENCRYPTION_EXCEPTION;
 			}	
+
+			return IBEX_ENCRYPTION_SUCCESS;
 		}
 
-		void CIbexFileEncryption::decrypt(const tstring &_srcFilePath, encryptBufferData_t &_buffer)
+		unsigned long CIbexFileEncryption::decrypt(const tstring &_srcFilePath, encryptBufferData_t &_buffer)
 		{
 			// check input parameter valid
 			if (_srcFilePath.empty())
 			{
-				return;
+				return IBEX_ENCRYPTION_FILE_EMPTY;
 			}
 			if (m_sKey.empty())
 			{
-				return;
+				return IBEX_ENCRYPTION_KEY_EMPTY;
 			}
 			try
 			{
@@ -118,7 +126,7 @@ namespace ibex {
 				if (!in.is_open())
 				{
 					std::cout << "open src file failed!" << std::endl;
-					return;
+					return IBEX_ENCRYPTION_FILE_OPEN_FAILED;
 				}
 				std::stringstream buffer;
 				buffer << in.rdbuf();
@@ -140,14 +148,14 @@ namespace ibex {
 				ret = EVP_DecryptInit_ex(&ctx, EVP_aes_256_ecb(), NULL, (unsigned char*)m_sKey.c_str(), (unsigned char*)&iv[0]);
 				if (ret != 1) {
 					std::cout << "EVP_DecryptInit_ex failed" << std::endl;
-					return;
+					return IBEX_ENCRYPTION_INIT_FAILED;
 				}
 
 				EVP_CIPHER_CTX_set_padding(&ctx, 0);
 				ret = EVP_DecryptUpdate(&ctx, (unsigned char*)&decrypt_buff[0], &update_len, (unsigned char*)buffer.str().c_str(), encrypt_len);
 				if (ret != 1) {
 					std::cout << "EVP_DecryptUpdate failed" << std::endl;
-					return;
+					return IBEX_ENCRYPTION_UPDATE_FAILED;
 				}
 				if (update_len >= encrypt_len)
 				{
@@ -158,7 +166,7 @@ namespace ibex {
 				ret = EVP_DecryptFinal_ex(&ctx, (unsigned char*)&decrypt_buff[update_len], &final_len);
 				if (ret != 1) {
 					std::cout << "EVP_DecryptFinal_ex failed" << std::endl;
-					return;
+					return IBEX_ENCRYPTION_FINAL_FAILED;
 				}
 				total_len = update_len + final_len;
 
@@ -171,8 +179,10 @@ namespace ibex {
 			catch (const std::exception& e)
 			{
 				std::cerr << "exception caused by: " << e.what() << std::endl;
-				return;
+				return IBEX_ENCRYPTION_EXCEPTION;
 			}
+
+			return IBEX_ENCRYPTION_SUCCESS;
 		}
 
 	} //namespace encryption
