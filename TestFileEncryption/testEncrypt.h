@@ -33,8 +33,8 @@ BOOST_AUTO_TEST_CASE(Encrypt_testKey)
 
 	unsigned long ret = encrypt.encrypt(buff, "C:\\TEST\\test.txt");
 
-	BOOST_CHECK_EQUAL(IBEX_ENCRYPTION_KEY_EMPTY, ret);
-	BOOST_CHECK_MESSAGE(ret == IBEX_ENCRYPTION_KEY_EMPTY, "encrypt key is empty");
+	BOOST_CHECK_EQUAL(IBEX_ENCRYPTION_KEY_INVALID, ret);
+	BOOST_CHECK_MESSAGE(ret == IBEX_ENCRYPTION_KEY_INVALID, "encrypt key is invalid");
 }
 
 BOOST_AUTO_TEST_CASE(Encrypt_testBuffer)
@@ -46,6 +46,23 @@ BOOST_AUTO_TEST_CASE(Encrypt_testBuffer)
 
 	BOOST_CHECK_EQUAL(IBEX_ENCRYPTION_BUFFER_EMPTY, ret);
 	BOOST_CHECK_MESSAGE(ret == IBEX_ENCRYPTION_BUFFER_EMPTY, "encrypt buffer is empty");
+}
+
+BOOST_AUTO_TEST_CASE(Encrypt_testNormal)
+{
+	ibex::encryption::CIbexFileEncryption *encrypt = new ibex::encryption::CIbexFileEncryption("123456789012345678901234567890aa");
+	ibex::encryption::encryptBufferData_t buff;
+	for (size_t i = 0; i < 20; i++)
+	{
+		buff.push_back('a');
+	}
+
+	unsigned long ret = encrypt->encrypt(buff, "C:\\TEST\\test.txt");
+
+	BOOST_CHECK_EQUAL(IBEX_ENCRYPTION_SUCCESS, ret);
+	BOOST_CHECK_MESSAGE(ret == IBEX_ENCRYPTION_SUCCESS, "encrypt buffer success");
+
+	delete encrypt;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

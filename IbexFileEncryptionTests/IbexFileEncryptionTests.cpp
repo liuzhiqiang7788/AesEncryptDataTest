@@ -5,9 +5,17 @@
 #include <iostream>
 #include "IbexFileEncryption.h"
 
+
 int main()
 {
-    
+	ibex::encryption::CIbexFileEncryption *encrypt = new ibex::encryption::CIbexFileEncryption(L"123456789012345678901234567890aa");
+	ibex::encryption::encryptBufferData_t buff;
+	for (size_t i = 0; i < 20; i++)
+	{
+		buff.push_back('a');
+	}
+
+	unsigned long ret = encrypt->encrypt(buff, L"C:\\TEST\\test.txt");
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

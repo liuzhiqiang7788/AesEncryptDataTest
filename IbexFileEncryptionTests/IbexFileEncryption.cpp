@@ -20,7 +20,7 @@ namespace ibex {
 
 		CIbexFileEncryption::~CIbexFileEncryption()
 		{
-
+			m_sKey.clear();
 		}
 
 		unsigned long CIbexFileEncryption::encrypt(const encryptBufferData_t &_buffer, const tstring &_destFilePath)
@@ -36,17 +36,18 @@ namespace ibex {
 				std::cout << "dest file path invalid" << std::endl;
 				return IBEX_ENCRYPTION_FILE_EMPTY;
 			}
-			if (m_sKey.empty())
+			if (m_sKey.size() != 32)
 			{
 				std::cout << "key value is null" << std::endl;
-				return IBEX_ENCRYPTION_KEY_EMPTY;
+				return IBEX_ENCRYPTION_KEY_INVALID;
 			}
 
 			try
 			{
 				// allocate a memory prepare for encrypt need smart class pointer
-				int origin_len = _buffer.size();
-				encryptBufferData_t encrypt_buffer(2 * origin_len);
+				int buf_len = _buffer.size();
+				int origin_len = 2*buf_len;
+				encryptBufferData_t encrypt_buffer(origin_len);
 				EVP_CIPHER_CTX ctx;
 				encryptBufferData_t iv(EVP_MAX_IV_LENGTH);
 				int ret;
@@ -63,17 +64,15 @@ namespace ibex {
 					return IBEX_ENCRYPTION_INIT_FAILED;
 				}
 
-				EVP_CIPHER_CTX_set_padding(&ctx, 0);
-
-				ret = EVP_EncryptUpdate(&ctx, (unsigned char*)&encrypt_buffer[0], &update_len, (unsigned char*)&_buffer[0], origin_len);
+				ret = EVP_EncryptUpdate(&ctx, (unsigned char*)&encrypt_buffer[0], &update_len, (unsigned char*)&_buffer[0], buf_len);
 				if (ret != 1) {
 					std::cout << "EVP_EncryptUpdate failed" << std::endl;
 					return IBEX_ENCRYPTION_UPDATE_FAILED;
 				}
-				if (update_len >= 2*origin_len)
+				if (update_len >= origin_len)
 				{
-					int n = update_len / (2 * origin_len);
-					encrypt_buffer.resize((n+1) * 2 * origin_len);
+					int n = update_len / origin_len;
+					encrypt_buffer.resize((n+1) * origin_len);
 				}
 
 				ret = EVP_EncryptFinal_ex(&ctx, (unsigned char*)&encrypt_buffer[update_len], &final_len);
@@ -115,9 +114,9 @@ namespace ibex {
 			{
 				return IBEX_ENCRYPTION_FILE_EMPTY;
 			}
-			if (m_sKey.empty())
+			if (m_sKey.size() != 32)
 			{
-				return IBEX_ENCRYPTION_KEY_EMPTY;
+				return IBEX_ENCRYPTION_KEY_INVALID;
 			}
 			try
 			{
@@ -151,7 +150,6 @@ namespace ibex {
 					return IBEX_ENCRYPTION_INIT_FAILED;
 				}
 
-				EVP_CIPHER_CTX_set_padding(&ctx, 0);
 				ret = EVP_DecryptUpdate(&ctx, (unsigned char*)&decrypt_buff[0], &update_len, (unsigned char*)buffer.str().c_str(), encrypt_len);
 				if (ret != 1) {
 					std::cout << "EVP_DecryptUpdate failed" << std::endl;
