@@ -50,7 +50,8 @@ BOOST_AUTO_TEST_CASE(Encrypt_testBuffer)
 
 BOOST_AUTO_TEST_CASE(Encrypt_testNormal)
 {
-	ibex::encryption::CIbexFileEncryption *encrypt = new ibex::encryption::CIbexFileEncryption("123456789012345678901234567890aa");
+	ibex::encryption::tstring keys = "123456789012345678901234567890aa";
+	ibex::encryption::CIbexFileEncryption *encrypt = new ibex::encryption::CIbexFileEncryption(keys);
 	ibex::encryption::encryptBufferData_t buff;
 	for (size_t i = 0; i < 20; i++)
 	{

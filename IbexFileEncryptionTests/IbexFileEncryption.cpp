@@ -15,12 +15,12 @@ namespace ibex {
 
 		CIbexFileEncryption::CIbexFileEncryption(const tstring &key)
 		{
-			m_sKey = key;
+			m_sKey = key.c_str();
 		}
 
 		CIbexFileEncryption::~CIbexFileEncryption()
 		{
-			m_sKey.clear();
+
 		}
 
 		unsigned long CIbexFileEncryption::encrypt(const encryptBufferData_t &_buffer, const tstring &_destFilePath)
@@ -91,11 +91,8 @@ namespace ibex {
 					std::cout << "open dest file failed!" << std::endl;
 					return IBEX_ENCRYPTION_FILE_OPEN_FAILED;
 				}
-				
-				for (int i = 0; i < total_len; i++)
-				{
-					out << encrypt_buffer[i];
-				}
+
+				out << &encrypt_buffer[0];
 				out.close();
 			}
 			catch (const std::exception& e)
@@ -169,10 +166,7 @@ namespace ibex {
 				total_len = update_len + final_len;
 
 				_buffer.clear();
-				for (int i = 0; i < total_len; i++)
-				{
-					_buffer.push_back(decrypt_buff[i]);
-				}
+				_buffer.assign(decrypt_buff.begin(), decrypt_buff.begin() + total_len);
 			}
 			catch (const std::exception& e)
 			{
@@ -183,6 +177,16 @@ namespace ibex {
 			return IBEX_ENCRYPTION_SUCCESS;
 		}
 
+		void CIbexFileEncryption::setKey(const tstring &skey)
+		{
+			m_sKey.clear();
+			m_sKey = skey;
+		}
+
+		tstring CIbexFileEncryption::getKey() const
+		{ 
+			return m_sKey;
+		}
 	} //namespace encryption
 
 } //namespace ibex

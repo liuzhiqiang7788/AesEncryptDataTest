@@ -18,6 +18,8 @@ namespace ibex {
 			~CIbexFileEncryption();
 			unsigned long encrypt(const encryptBufferData_t &_buffer, const tstring &_destFilePath);
 			unsigned long decrypt(const tstring &_srcFilePath, encryptBufferData_t &_buffer);
+			void setKey(const tstring &skey);
+			tstring getKey() const;
 		private:
 			tstring m_sKey;
 		};
