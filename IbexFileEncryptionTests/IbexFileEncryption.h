@@ -4,6 +4,7 @@
 #include <string>
 #include <windows.h>
 
+
 namespace ibex {
 
 	namespace encryption {
@@ -20,6 +21,7 @@ namespace ibex {
 			unsigned long decrypt(const tstring &_srcFilePath, encryptBufferData_t &_buffer);
 			void setKey(const tstring &skey);
 			tstring getKey() const;
+			tstring generateRandomString(long int);
 		private:
 			tstring m_sKey;
 		};

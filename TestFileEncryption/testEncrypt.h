@@ -2,21 +2,18 @@
 #include <boost/test/included/unit_test.hpp>
 #include "../IbexFileEncryptionTests/define.h"
 #include "../IbexFileEncryptionTests/IbexFileEncryption.h"
-
+#include <tchar.h>
 using namespace std;
 
 BOOST_AUTO_TEST_SUITE(Encrypt_tests)
 
 BOOST_AUTO_TEST_CASE(Encrypt_testFile)
 {
-	ibex::encryption::CIbexFileEncryption encrypt("12345");
+	ibex::encryption::CIbexFileEncryption encrypt(_T("12345"));
 	ibex::encryption::encryptBufferData_t buff;
-	for (size_t i = 0; i < 10; i++)
-	{
-		buff.push_back('a');
-	}
+	buff.assign(10, 'a');
 	
-	unsigned long ret = encrypt.encrypt(buff,"");
+	unsigned long ret = encrypt.encrypt(buff,_T(""));
 
 	BOOST_CHECK_EQUAL(IBEX_ENCRYPTION_FILE_EMPTY, ret);
 	BOOST_CHECK_MESSAGE(ret == IBEX_ENCRYPTION_FILE_EMPTY, "encrypt dest file is empty");
@@ -24,14 +21,11 @@ BOOST_AUTO_TEST_CASE(Encrypt_testFile)
 
 BOOST_AUTO_TEST_CASE(Encrypt_testKey)
 {
-	ibex::encryption::CIbexFileEncryption encrypt("");
+	ibex::encryption::CIbexFileEncryption encrypt(_T(""));
 	ibex::encryption::encryptBufferData_t buff;
-	for (size_t i = 0; i < 10; i++)
-	{
-		buff.push_back('a');
-	}
+	buff.assign(10, 'a');
 
-	unsigned long ret = encrypt.encrypt(buff, "C:\\TEST\\test.txt");
+	unsigned long ret = encrypt.encrypt(buff, _T("C:\\TEST\\test.txt"));
 
 	BOOST_CHECK_EQUAL(IBEX_ENCRYPTION_KEY_INVALID, ret);
 	BOOST_CHECK_MESSAGE(ret == IBEX_ENCRYPTION_KEY_INVALID, "encrypt key is invalid");
@@ -39,10 +33,10 @@ BOOST_AUTO_TEST_CASE(Encrypt_testKey)
 
 BOOST_AUTO_TEST_CASE(Encrypt_testBuffer)
 {
-	ibex::encryption::CIbexFileEncryption encrypt("12345");
+	ibex::encryption::CIbexFileEncryption encrypt(_T("12345"));
 	ibex::encryption::encryptBufferData_t buff;
 
-	unsigned long ret = encrypt.encrypt(buff, "C:\\TEST\\test.txt");
+	unsigned long ret = encrypt.encrypt(buff, _T("C:\\TEST\\test.txt"));
 
 	BOOST_CHECK_EQUAL(IBEX_ENCRYPTION_BUFFER_EMPTY, ret);
 	BOOST_CHECK_MESSAGE(ret == IBEX_ENCRYPTION_BUFFER_EMPTY, "encrypt buffer is empty");
@@ -50,20 +44,15 @@ BOOST_AUTO_TEST_CASE(Encrypt_testBuffer)
 
 BOOST_AUTO_TEST_CASE(Encrypt_testNormal)
 {
-	ibex::encryption::tstring keys = "123456789012345678901234567890aa";
-	ibex::encryption::CIbexFileEncryption *encrypt = new ibex::encryption::CIbexFileEncryption(keys);
+	ibex::encryption::CIbexFileEncryption encrypt(_T("123456789012345678901234567890aa"));
 	ibex::encryption::encryptBufferData_t buff;
-	for (size_t i = 0; i < 20; i++)
-	{
-		buff.push_back('a');
-	}
 
-	unsigned long ret = encrypt->encrypt(buff, "C:\\TEST\\test.txt");
+	buff.assign(33, 'a');
+	unsigned long ret = encrypt.encrypt(buff, _T("C:\\TEST\\test.txt"));
 
 	BOOST_CHECK_EQUAL(IBEX_ENCRYPTION_SUCCESS, ret);
 	BOOST_CHECK_MESSAGE(ret == IBEX_ENCRYPTION_SUCCESS, "encrypt buffer success");
 
-	delete encrypt;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

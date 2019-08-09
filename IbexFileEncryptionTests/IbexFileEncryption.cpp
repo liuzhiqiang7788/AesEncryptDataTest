@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 
+
 namespace ibex {
 
 	namespace encryption {
@@ -55,10 +56,18 @@ namespace ibex {
 				int update_len = 0;
 				int final_len = 0;
 
+				long int seed = static_cast<long int>(time(NULL));
+				tstring rand = generateRandomString(seed);
+				//m_sKey += rand;
+
+				//need to conversion
+				std::vector<char> CombineKey(m_sKey.size());
+				WideCharToMultiByte(CP_ACP, 0, m_sKey.c_str(), wcslen(m_sKey.c_str()), &CombineKey[0], m_sKey.size(), NULL, NULL);
+
 				//encrypt process
 				EVP_CIPHER_CTX_init(&ctx);
 
-				ret = EVP_EncryptInit_ex(&ctx, EVP_aes_256_ecb(), NULL, (unsigned char*)m_sKey.c_str(), (unsigned char*)&iv[0]);
+				ret = EVP_EncryptInit_ex(&ctx, EVP_aes_256_ecb(), NULL, (unsigned char*)&CombineKey[0], (unsigned char*)&iv[0]);
 				if (ret != 1) {
 					std::cout << "EVP_EncryptInit_ex failed" << std::endl;
 					return IBEX_ENCRYPTION_INIT_FAILED;
@@ -91,7 +100,7 @@ namespace ibex {
 					std::cout << "open dest file failed!" << std::endl;
 					return IBEX_ENCRYPTION_FILE_OPEN_FAILED;
 				}
-
+				//out << seed;
 				out << &encrypt_buffer[0];
 				out.close();
 			}
@@ -141,7 +150,10 @@ namespace ibex {
 
 				EVP_CIPHER_CTX_init(&ctx);
 
-				ret = EVP_DecryptInit_ex(&ctx, EVP_aes_256_ecb(), NULL, (unsigned char*)m_sKey.c_str(), (unsigned char*)&iv[0]);
+				std::vector<char> CombineKey(m_sKey.size());
+				WideCharToMultiByte(CP_ACP, 0, m_sKey.c_str(), wcslen(m_sKey.c_str()), &CombineKey[0], m_sKey.size(), NULL, NULL);
+
+				ret = EVP_DecryptInit_ex(&ctx, EVP_aes_256_ecb(), NULL, (unsigned char*)CombineKey[0], (unsigned char*)&iv[0]);
 				if (ret != 1) {
 					std::cout << "EVP_DecryptInit_ex failed" << std::endl;
 					return IBEX_ENCRYPTION_INIT_FAILED;
@@ -186,6 +198,30 @@ namespace ibex {
 		tstring CIbexFileEncryption::getKey() const
 		{ 
 			return m_sKey;
+		}
+
+		tstring CIbexFileEncryption::generateRandomString(long int seed)
+		{
+			tstring str;
+			int i, flag;
+			srand(seed);
+			for (i = 0; i < 10; i++)
+			{
+				flag = rand() % 3;
+				switch (flag)
+				{
+				case 0:
+					str += rand() % 26 + 'a';
+					break;
+				case 1:
+					str += rand() % 26 + 'A';
+					break;
+				case 2:
+					str += rand() % 10 + '0';
+					break;
+				}
+			}
+			return str;
 		}
 	} //namespace encryption
 
